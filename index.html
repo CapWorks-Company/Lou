@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+/* Layout: une plaque d'usine étroite, une grue à pince au-dessus qui pose les mots, question et boutons centrés en bas. */
 :root {
   color-scheme: light;
   --bg: #e7e4dc;
@@ -396,7 +397,8 @@ p { margin: 0; }
   <p class="drift type">J'ai toujours été nul en amour. Je réfléchis trop, et quand j'ai enfin trouvé les mots, le moment est passé. Alors j'ai fait un site.</p>
 
   <p class="drift type">Je ne vais pas te faire un grand discours. Je veux juste te dire que tu comptes pour moi. Quand tu es là, ma journée est plus légère, et j'adore ta façon de rire.</p>
-  
+
+  <!-- Idée : ajoute ici une phrase sur un vrai souvenir avec elle, c'est ce qui touche le plus. -->
   <p class="drift type">J'aimerais mieux te connaître et passer du temps avec toi. Quelle que soit ta réponse, je te respecte, et je préfère te le dire plutôt que me taire.</p>
 
   <section class="ask">
@@ -751,6 +753,7 @@ p { margin: 0; }
     finalNo = true;
     lockChoices();
     markAnswered("no");
+    notifyAnswer("no");
     letter.classList.add("gone");
     dust();
     setTimeout(function () { $("farewell").classList.add("on"); }, reduce ? 0 : 900);
@@ -888,16 +891,21 @@ p { margin: 0; }
     if (!raf) raf = requestAnimationFrame(frame);
   }
 
-  /* Mail "elle a dit oui" : ne marche que si la page est en ligne (pas ouverte depuis un fichier). */
+  /* Mail de réponse : "Elle a dit oui" ou "Elle a dit non". Ne marche que si la page est en ligne (pas ouverte depuis un fichier). */
   var mailSent = false;
-  function notifyYes() {
+  function notifyAnswer(kind) {
     if (mailSent || !NOTIFY_EMAIL || location.protocol === "file:") return;
     mailSent = true;
+    var yesAnswer = kind === "yes";
+    var subject = TEST
+      ? "Test : le mail fonctionne (" + (yesAnswer ? "oui" : "non") + ")"
+      : (yesAnswer ? "Elle a dit oui" : "Elle a dit non");
+    var message = TEST ? "Ceci est un essai." : (yesAnswer ? "Lou a dit oui !" : "Lou a dit non.");
     try {
       fetch("https://formsubmit.co/ajax/" + encodeURIComponent(NOTIFY_EMAIL), {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({ _subject: TEST ? "Test : le mail fonctionne" : "Elle a dit oui", _template: "box", message: TEST ? "Ceci est un essai." : "Lou a dit oui !" })
+        body: JSON.stringify({ _subject: subject, _template: "box", message: message })
       }).catch(function () {});
     } catch (e) {}
   }
@@ -906,7 +914,7 @@ p { margin: 0; }
     finalYes = true;
     lockChoices();
     markAnswered("yes");
-    notifyYes();
+    notifyAnswer("yes");
     var r = yes.getBoundingClientRect();
     var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
     ring(cx, cy, "#ffb86b", 280, 900);
