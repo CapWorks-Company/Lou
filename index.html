@@ -1,0 +1,957 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pour Lou</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #e7e4dc;
+  --paper: #f7f5ef;
+  --ink: #1f2430;
+  --muted: #5e6574;
+  --steel: #6b7384;
+  --hazard: #f2c200;
+  --hazard-ink: #14110a;
+  --accent: #c2314c;
+  --accent-ink: #ffffff;
+  --line: #cfcabd;
+  --btn-ink: #1a1230;
+  --font-display: "Chakra Petch", "Arial Narrow", Arial, sans-serif;
+  --font-body: "IBM Plex Mono", "Courier New", Courier, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #12151c;
+    --paper: #1b1f29;
+    --ink: #e8e6e1;
+    --muted: #9aa3b5;
+    --steel: #8b93a3;
+    --accent: #ff6f8a;
+    --accent-ink: #2a0f1a;
+    --line: #333a4a;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #12151c;
+  --paper: #1b1f29;
+  --ink: #e8e6e1;
+  --muted: #9aa3b5;
+  --steel: #8b93a3;
+  --accent: #ff6f8a;
+  --accent-ink: #2a0f1a;
+  --line: #333a4a;
+}
+
+* { box-sizing: border-box; }
+html { padding-block: env(safe-area-inset-top, 0px) env(safe-area-inset-bottom, 0px); }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.98rem;
+  line-height: 1.75;
+  padding-inline: 1rem;
+  padding-block: 2.5rem 4rem;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+.letter {
+  position: relative;
+  max-width: 38rem;
+  margin-inline: auto;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  padding: clamp(3.2rem, 9vw, 4rem) clamp(1.25rem, 6vw, 3rem) clamp(1.5rem, 6vw, 2.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+.letter::before {
+  content: "";
+  position: absolute; left: -2px; right: -2px; top: -2px; height: 12px;
+  border-radius: 8px 8px 0 0;
+  background: repeating-linear-gradient(-45deg, var(--hazard) 0 10px, #14110a 10px 20px);
+}
+.drift { transition: transform 0.6s ease-in-out, filter 0.6s; will-change: transform; }
+.label {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0;
+}
+h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.3rem, 11vw, 3.4rem);
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  margin: 0;
+  text-wrap: balance;
+}
+p { margin: 0; }
+.sign {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+  line-height: 1.3;
+  color: var(--accent);
+}
+
+/* Mots posés par la grue */
+.w { display: inline-block; opacity: 0; transform: translateY(-8px); transition: opacity 0.08s linear, transform 0.1s ease-out; }
+.w.in { opacity: 1; transform: none; }
+
+/* Machine d'usine sur le côté : rail vertical à gauche, chariot, bras horizontal, pince */
+.beam {
+  position: absolute; left: 5px; top: 18px; bottom: 12px; width: 7px;
+  background: var(--steel);
+  border-inline: 1px solid var(--ink);
+}
+.trolley, .cable, .claw, .ghost { opacity: 0; pointer-events: none; transition: opacity 0.5s; }
+.machine-on .trolley, .machine-on .cable, .machine-on .claw, .machine-on .ghost { opacity: 1; }
+.trolley {
+  position: absolute; left: 1px; top: 0; width: 17px; height: 30px; z-index: 4;
+  background: var(--hazard);
+  border: 2px solid var(--hazard-ink);
+  border-radius: 3px;
+  will-change: transform;
+}
+.cable {
+  position: absolute; left: 16px; top: 0; width: 100px; height: 4px; z-index: 3;
+  background: var(--steel);
+  border-block: 1px solid var(--ink);
+  transform-origin: 0 0;
+}
+.claw { position: absolute; left: 0; top: 0; width: 24px; height: 16px; z-index: 4; will-change: transform; }
+.claw::before {
+  content: ""; position: absolute; left: 4px; top: 0; width: 16px; height: 6px;
+  background: var(--ink); border-radius: 2px;
+}
+.claw i {
+  position: absolute; top: 4px; width: 4px; height: 12px;
+  background: var(--ink); border-radius: 1px; transform-origin: 50% 0;
+}
+.claw .jl { left: 3px; }
+.claw .jr { right: 3px; }
+.claw.ga .jl { animation: jlA 0.08s ease-out both; }
+.claw.ga .jr { animation: jrA 0.08s ease-out both; }
+.claw.gb .jl { animation: jlB 0.08s ease-out both; }
+.claw.gb .jr { animation: jrB 0.08s ease-out both; }
+@keyframes jlA { from { transform: rotate(18deg); } to { transform: rotate(-14deg); } }
+@keyframes jrA { from { transform: rotate(-18deg); } to { transform: rotate(14deg); } }
+@keyframes jlB { from { transform: rotate(18deg); } to { transform: rotate(-14deg); } }
+@keyframes jrB { from { transform: rotate(-18deg); } to { transform: rotate(14deg); } }
+.ghost {
+  position: absolute; left: 0; top: 0; z-index: 2;
+  background: var(--ink); color: var(--paper);
+  white-space: nowrap; border-radius: 2px;
+  text-align: center;
+}
+.trolley, .claw, .ghost { transition: transform 0.1s linear, opacity 0.5s; }
+.cable { transition: transform 0.1s linear, opacity 0.5s; }
+
+.skip {
+  position: absolute; top: 24px; right: 0.6rem; z-index: 5;
+  font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid var(--steel); background: var(--paper); color: var(--muted);
+  border-radius: 3px; cursor: pointer;
+}
+
+.ask {
+  margin-top: 1rem;
+  padding-top: 1.75rem;
+  border-top: 2px dashed var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  text-align: center;
+}
+.ask h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 7vw, 2rem);
+  line-height: 1.2;
+  margin: 0;
+  text-wrap: balance;
+}
+.choices {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 1.8rem;
+  padding-block: 0.5rem;
+  opacity: 0; pointer-events: none; transition: opacity 0.6s;
+}
+.choices.ready { opacity: 1; pointer-events: auto; }
+.hint { min-height: 1.75em; font-size: 0.85rem; color: var(--muted); }
+
+.status {
+  display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+  font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--muted);
+  padding-top: 0.5rem;
+}
+.led { width: 10px; height: 10px; border-radius: 50%; background: var(--hazard); animation: blink 0.5s steps(2) infinite; }
+.led.done { background: #2bbd6e; animation: none; box-shadow: 0 0 8px #2bbd6e; }
+@keyframes blink { 50% { opacity: 0.25; } }
+
+/* Boutons : repos, armé (1er clic), validé (2e clic) */
+.choices button {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 0.8rem 2.2rem;
+  min-height: 3rem;
+  border: 2px solid var(--accent);
+  animation: nudge 5s ease-in-out infinite;
+}
+.choices button:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+.choices button.armed {
+  animation: buzz 0.13s linear infinite;
+  transform: scale(1.25);
+  z-index: 2;
+}
+.yes {
+  color: var(--btn-ink);
+  border-color: transparent;
+  background: linear-gradient(90deg, #ff8fa3, #ffb86b, #ffe66d, #8fe388, #6ec6ff, #c39bff, #ff8fa3);
+  background-size: 300% 100%;
+  animation: nudge 5s ease-in-out infinite, slide 7s linear infinite;
+}
+.choices .yes.armed { animation: buzz 0.13s linear infinite, slide 1.4s linear infinite; box-shadow: 0 0 22px 4px rgba(255, 184, 107, 0.6); }
+.no { background: transparent; color: var(--accent); }
+.choices .no.armed { box-shadow: 0 0 18px 3px rgba(194, 49, 76, 0.4); }
+@keyframes slide { to { background-position: 300% 0; } }
+@keyframes nudge {
+  0%, 88%, 100% { transform: translate(0, 0) rotate(0); }
+  90% { transform: translate(-2px, 0) rotate(-1.2deg); }
+  92% { transform: translate(2px, 0) rotate(1.2deg); }
+  94% { transform: translate(-2px, 0) rotate(-1.2deg); }
+  96% { transform: translate(2px, 0) rotate(1.2deg); }
+}
+@keyframes buzz {
+  0%, 100% { transform: translate(0, 0) rotate(0) scale(1.25); }
+  20% { transform: translate(-2px, 1px) rotate(-1.5deg) scale(1.25); }
+  40% { transform: translate(2px, -1px) rotate(1.5deg) scale(1.25); }
+  60% { transform: translate(-1px, -2px) rotate(-1deg) scale(1.25); }
+  80% { transform: translate(1px, 2px) rotate(1deg) scale(1.25); }
+}
+.spark {
+  position: fixed; z-index: 25; width: 6px; height: 6px; border-radius: 50%;
+  pointer-events: none;
+}
+
+#fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 25; }
+.ring { position: fixed; z-index: 26; border: 3px solid #ffb86b; border-radius: 50%; pointer-events: none; }
+.flash { position: fixed; inset: 0; z-index: 27; pointer-events: none; background: linear-gradient(135deg, #ff8fa3, #ffb86b, #ffe66d, #8fe388, #6ec6ff, #c39bff); }
+.letter.fade { opacity: 0; transition: opacity 0.45s ease-out; }
+.testbadge {
+  position: fixed; left: 8px; bottom: 8px; z-index: 70;
+  font-family: var(--font-display); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+  background: var(--hazard); color: var(--hazard-ink); padding: 0.25rem 0.6rem; border-radius: 3px;
+}
+/* Engrenages de la machine */
+.gears {
+  position: absolute; right: 5.4rem; top: 20px; width: 56px; height: 38px;
+  color: var(--steel); opacity: 0; pointer-events: none; transition: opacity 0.5s;
+}
+.machine-on .gears { opacity: 1; }
+.gear { position: absolute; animation: spin 2.4s linear infinite; }
+.gear.g1 { left: 0; top: 2px; width: 32px; height: 32px; }
+.gear.g2 { left: 28px; top: 14px; width: 22px; height: 22px; animation-duration: 1.6s; animation-direction: reverse; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.thanks {
+  position: fixed; inset: 0; z-index: 30;
+  display: grid; place-items: center;
+  padding: 1rem;
+  pointer-events: none;
+}
+.thanks[hidden] { display: none; }
+.thanks-card {
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 28rem;
+  display: flex; flex-direction: column; gap: 1.1rem;
+  animation: pop 0.6s ease-out both;
+}
+.merci {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(3.2rem, 18vw, 5rem);
+  line-height: 1;
+  display: flex;
+}
+.merci span {
+  display: inline-block; opacity: 0;
+  animation: letter 0.5s cubic-bezier(.2,.9,.3,1.4) forwards;
+}
+.merci span:nth-child(1) { color: #ef476f; animation-delay: 0.25s; }
+.merci span:nth-child(2) { color: #d96c00; animation-delay: 0.45s; }
+.merci span:nth-child(3) { color: #1f9d63; animation-delay: 0.65s; }
+.merci span:nth-child(4) { color: #118ab2; animation-delay: 0.85s; }
+.merci span:nth-child(5) { color: #9b5de5; animation-delay: 1.05s; }
+.thanks-card .after { opacity: 0; animation: letter 0.6s ease-out 1.5s forwards; }
+.thanks-card .close {
+  align-self: flex-start;
+  font-family: var(--font-display); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 999px; padding: 0.7rem 1.8rem; min-height: 3rem;
+  border: 2px solid var(--accent); background: var(--accent); color: var(--accent-ink);
+}
+@keyframes pop { from { transform: scale(0.85); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes letter { from { opacity: 0; transform: translateY(24px) scale(0.6); } to { opacity: 1; transform: none; } }
+
+[hidden] { display: none !important; }
+
+/* Écran pour les visiteurs qui ne sont pas Lou */
+.lock {
+  position: fixed; inset: 0; z-index: 60;
+  background: var(--bg);
+  display: grid; place-items: center;
+  padding: 1rem; text-align: center;
+}
+.lock-card {
+  position: relative;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  padding: 3rem 1.5rem 2rem;
+  max-width: 28rem;
+  display: flex; flex-direction: column; gap: 0.8rem;
+}
+.lock-card::before {
+  content: ""; position: absolute; left: -2px; right: -2px; top: -2px; height: 12px;
+  border-radius: 8px 8px 0 0;
+  background: repeating-linear-gradient(-45deg, var(--hazard) 0 10px, #14110a 10px 20px);
+}
+.lock-card h2 { font-family: var(--font-display); font-size: clamp(1.8rem, 8vw, 2.4rem); line-height: 1.1; margin: 0; }
+.lock-card p { margin: 0; }
+
+/* Le "Non" : la page glisse hors de l'écran, puis le message apparaît */
+.letter { transition: transform 0.8s cubic-bezier(.1,.7,.3,1); }
+.letter.gone {
+  transform: translateX(-130vw) rotate(-6deg);
+  transition: transform 0.9s cubic-bezier(.6,0,.9,.4);
+}
+.farewell {
+  position: fixed; inset: 0; z-index: 40;
+  background: var(--bg);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.6s ease-out;
+  display: grid; place-items: center; align-content: center; gap: 1.5rem;
+  padding: 1rem; text-align: center;
+}
+.farewell.on { opacity: 1; pointer-events: auto; }
+.farewell.now { transition: none; }
+.farewell p { max-width: 22rem; font-family: var(--font-display); font-size: 1.3rem; line-height: 1.4; }
+.farewell button {
+  font-family: var(--font-display); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  cursor: pointer; border-radius: 999px; padding: 0.7rem 1.8rem; min-height: 3rem;
+  background: transparent; color: var(--accent); border: 2px solid var(--accent);
+}
+.farewell button:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .drift, .w, .letter, .letter.gone { transition: none; }
+  .thanks-card, .merci span, .thanks-card .after { animation: none; opacity: 1; }
+  .choices button, .yes, .choices .yes.armed, .led, .gear { animation: none; }
+  .choices button.armed { transform: scale(1.15); }
+}
+</style>
+</head>
+<body>
+
+<main class="letter" id="letter">
+  <div class="beam" aria-hidden="true"></div>
+  <div class="gears" id="gears" aria-hidden="true"></div>
+  <div class="trolley" id="trolley" aria-hidden="true"></div>
+  <div class="cable" id="cable" aria-hidden="true"></div>
+  <div class="claw" id="claw" aria-hidden="true"><i class="jl"></i><i class="jr"></i></div>
+  <div class="ghost" id="ghost" aria-hidden="true"></div>
+  <button type="button" class="skip" id="btn-skip" hidden>Passer</button>
+
+  <p class="label drift type">Pour Lou</p>
+  <h1 class="drift type">Salut Lou.</h1>
+
+  <p class="drift type">J'ai toujours été nul en amour. Je réfléchis trop, et quand j'ai enfin trouvé les mots, le moment est passé. Alors j'ai fait un site.</p>
+
+  <p class="drift type">Je ne vais pas te faire un grand discours. Je veux juste te dire que tu comptes pour moi. Quand tu es là, ma journée est plus légère, et j'adore ta façon de rire.</p>
+  
+  <p class="drift type">J'aimerais mieux te connaître et passer du temps avec toi. Quelle que soit ta réponse, je te respecte, et je préfère te le dire plutôt que me taire.</p>
+
+  <p class="sign drift type">Merci d'avoir lu jusqu'ici.</p>
+
+  <section class="ask">
+    <h2 class="drift type">Voudrais-tu sortir avec moi ?</h2>
+    <div class="choices drift" id="choices">
+      <button type="button" id="btn-yes" class="yes">Oui</button>
+      <button type="button" id="btn-no" class="no">Non</button>
+    </div>
+    <p class="hint" id="hint" aria-live="polite"></p>
+  </section>
+
+  <div class="status" aria-hidden="true"><span class="led" id="led"></span><span id="status-text">Assemblage en cours</span></div>
+</main>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<div class="thanks" id="thanks" hidden role="dialog" aria-labelledby="merci">
+  <div class="thanks-card">
+    <p class="merci" id="merci" aria-label="Merci"><span>M</span><span>e</span><span>r</span><span>c</span><span>i</span></p>
+    <p class="after">Je ne m'attendais pas à être aussi heureux en lisant ça. Maintenant, il va falloir que tu me le dises en vrai, et que je trouve quoi répondre sans être trop nul.</p>
+  </div>
+</div>
+
+<div class="lock" id="lock" hidden role="alert">
+  <div class="lock-card">
+    <h2>Tu n'es pas Lou.</h2>
+    <p>Merci de bien vouloir sortir de ce site.</p>
+  </div>
+</div>
+
+<div class="farewell" id="farewell" aria-live="polite">
+  <p>Pas de souci. Merci d'avoir pris le temps de lire.</p>
+</div>
+
+<script>
+(function () {
+  /* Adresse qui reçoit le mail "elle a dit oui". Pour ne pas en envoyer, mets "" ici. */
+  var NOTIFY_EMAIL = "kyan12.bost@gmail.com";
+
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var $ = function (id) { return document.getElementById(id); };
+  var letter = $("letter"), trolley = $("trolley"), cable = $("cable"), claw = $("claw"), ghost = $("ghost");
+
+  /* ---------- Étincelles ---------- */
+  var rainbow = ["#ff8fa3", "#ffb86b", "#ffe66d", "#8fe388", "#6ec6ff", "#c39bff"];
+  var warm = ["#f2c200", "#ffb86b", "#ff6f8a", "#ffffff"];
+
+  function spark(x, y, color, dist, dur) {
+    if (reduce) return;
+    var s = document.createElement("span");
+    s.className = "spark";
+    s.style.left = x + "px";
+    s.style.top = y + "px";
+    s.style.background = color;
+    document.body.appendChild(s);
+    var a = Math.random() * Math.PI * 2;
+    var d = dist * (0.6 + Math.random() * 0.8);
+    var anim = s.animate(
+      [
+        { transform: "translate(0,0) scale(1)", opacity: 1 },
+        { transform: "translate(" + Math.cos(a) * d + "px," + Math.sin(a) * d + "px) scale(0.2)", opacity: 0 }
+      ],
+      { duration: dur, easing: "ease-out" }
+    );
+    anim.onfinish = function () { s.remove(); };
+  }
+
+  function ring(x, y, color, size, dur) {
+    if (reduce) return;
+    var r = document.createElement("span");
+    r.className = "ring";
+    r.style.left = x + "px";
+    r.style.top = y + "px";
+    r.style.width = size + "px";
+    r.style.height = size + "px";
+    r.style.borderColor = color;
+    document.body.appendChild(r);
+    var a = r.animate(
+      [
+        { transform: "translate(-50%,-50%) scale(0.1)", opacity: 1 },
+        { transform: "translate(-50%,-50%) scale(1)", opacity: 0 }
+      ],
+      { duration: dur, easing: "ease-out" }
+    );
+    a.onfinish = function () { r.remove(); };
+  }
+
+  function flash() {
+    if (reduce) return;
+    var f = document.createElement("div");
+    f.className = "flash";
+    document.body.appendChild(f);
+    var a = f.animate([{ opacity: 0.6 }, { opacity: 0 }], { duration: 800, easing: "ease-out" });
+    a.onfinish = function () { f.remove(); };
+  }
+
+  /* Traînée d'étincelles sous le doigt ou la souris, et petite explosion à chaque appui */
+  if (!reduce) {
+    var lastMove = 0;
+    document.addEventListener("pointermove", function (e) {
+      var n = performance.now();
+      if (n - lastMove < 45) return;
+      lastMove = n;
+      spark(e.clientX, e.clientY, rainbow[Math.floor(Math.random() * rainbow.length)], 16, 500);
+    }, { passive: true });
+    document.addEventListener("pointerdown", function (e) {
+      for (var i = 0; i < 7; i++) spark(e.clientX, e.clientY, rainbow[i % rainbow.length], 30, 520);
+      ring(e.clientX, e.clientY, "#ffb86b", 60, 450);
+    }, { passive: true });
+  }
+
+  /* Engrenages */
+  (function () {
+    function gear(teeth, ro, ri, cls) {
+      var pts = [], n = teeth * 4;
+      for (var i = 0; i < n; i++) {
+        var a = (i / n) * Math.PI * 2;
+        var rad = i % 4 < 2 ? ro : ri;
+        pts.push((Math.cos(a) * rad).toFixed(1) + "," + (Math.sin(a) * rad).toFixed(1));
+      }
+      return '<svg class="gear ' + cls + '" viewBox="-20 -20 40 40"><polygon points="' + pts.join(" ") +
+        '" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle r="4" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+    }
+    $("gears").innerHTML = gear(8, 18, 14, "g1") + gear(6, 18, 14, "g2");
+  })();
+
+  /* ---------- La grue attrape et pose les mots ---------- */
+  var words = [];
+  Array.prototype.slice.call(document.querySelectorAll(".type")).forEach(function (el) {
+    var parts = el.textContent.trim().split(/\s+/);
+    el.textContent = "";
+    parts.forEach(function (t, i) {
+      var w = document.createElement("span");
+      w.className = "w";
+      w.textContent = t;
+      el.appendChild(w);
+      if (i < parts.length - 1) el.appendChild(document.createTextNode(" "));
+      words.push({ el: w, last: i === parts.length - 1 });
+    });
+    el.setAttribute("aria-label", parts.join(" "));
+  });
+
+  var typingDone = false;
+  var wi = 0;
+  var typeTimer = null;
+  var flip = false;
+
+  function finishTyping() {
+    if (typingDone) return;
+    typingDone = true;
+    clearTimeout(typeTimer);
+    words.forEach(function (w) { w.el.classList.add("in"); });
+    letter.classList.remove("machine-on");
+    $("btn-skip").hidden = true;
+    $("choices").classList.add("ready");
+    $("led").classList.add("done");
+    $("status-text").textContent = "Message prêt";
+    if (!reduce) {
+      letter.animate(
+        [{ boxShadow: "0 0 0 0 rgba(242,194,0,0.8)" }, { boxShadow: "0 0 0 16px rgba(242,194,0,0)" }],
+        { duration: 900, easing: "ease-out" }
+      );
+      var yr = yes.getBoundingClientRect(), nr = no.getBoundingClientRect();
+      for (var i = 0; i < 14; i++) {
+        var b = i % 2 ? yr : nr;
+        spark(b.left + b.width / 2, b.top + b.height / 2, rainbow[i % rainbow.length], 46, 700);
+      }
+    }
+  }
+
+  function step() {
+    if (typingDone) return;
+    if (wi > 0) words[wi - 1].el.classList.add("in");
+    if (wi >= words.length) { finishTyping(); return; }
+    var item = words[wi++];
+    var el = item.el;
+    var r = el.getBoundingClientRect();
+    var L = letter.getBoundingClientRect();
+    var ox = r.left - L.left - letter.clientLeft;
+    var oy = r.top - L.top - letter.clientTop;
+    var cx = ox + r.width / 2;
+    var clawY = oy - 14;
+    var armLen = Math.max(4, cx - 16);
+    var cs = getComputedStyle(el);
+
+    ghost.textContent = el.textContent;
+    ghost.style.fontFamily = cs.fontFamily;
+    ghost.style.fontSize = cs.fontSize;
+    ghost.style.fontWeight = cs.fontWeight;
+    ghost.style.letterSpacing = cs.letterSpacing;
+    ghost.style.lineHeight = r.height + "px";
+    ghost.style.width = r.width + "px";
+    ghost.style.height = r.height + "px";
+    ghost.style.transform = "translate(" + ox + "px," + oy + "px)";
+
+    trolley.style.transform = "translate(0," + (clawY - 12) + "px)";
+    cable.style.transform = "translate(0," + (clawY + 1) + "px) scaleX(" + (armLen / 100) + ")";
+    claw.style.transform = "translate(" + (cx - 12) + "px," + clawY + "px)";
+
+    claw.classList.remove("ga", "gb");
+    void claw.offsetWidth;
+    claw.classList.add(flip ? "ga" : "gb");
+    flip = !flip;
+
+    spark(r.left + r.width / 2, r.top + 2, warm[wi % warm.length], 12, 320);
+    if (item.last && !reduce) {
+      letter.animate([{ transform: "translateY(0)" }, { transform: "translateY(2px)" }, { transform: "translateY(0)" }], { duration: 150 });
+    }
+
+    var delay = 32 + el.textContent.length * 9 + (item.last ? 380 : 0);
+    typeTimer = setTimeout(step, delay);
+  }
+
+  /* ---------- Réservé à Lou : après sa réponse, les autres sont mis dehors ---------- */
+  var LOCK_BASE = "https://abacus.jasoncameron.dev";
+  var LOCK_NS = "pour-lou-site";
+  /* Pour tout remettre à zéro, change ce mot par un autre. */
+  var LOCK_ROOM = "k7x2m9";
+  /* Avec ?test à la fin de l'adresse : rien n'est mémorisé ni verrouillé, seul le mail d'essai part. */
+  var TEST = /[?&]test(=|&|$)/.test(location.search);
+  var ME_KEY = "pour-lou-moi-" + LOCK_ROOM;
+  var ANS_KEY = "pour-lou-reponse-" + LOCK_ROOM;
+  var lockedOut = false;
+  var finalYes = false;
+  var finalNo = false;
+
+  function isMe() {
+    try { return localStorage.getItem(ME_KEY) === "1"; } catch (e) { return false; }
+  }
+
+  function savedAnswer() {
+    if (TEST) return null;
+    try { return localStorage.getItem(ANS_KEY); } catch (e) { return null; }
+  }
+
+  function remoteAnswered() {
+    return fetch(LOCK_BASE + "/get/" + LOCK_NS + "/" + LOCK_ROOM)
+      .then(function (r) { return r.ok ? r.json() : { value: 0 }; })
+      .then(function (j) { return Number(j && j.value) > 0; })
+      .catch(function () { return false; });
+  }
+
+  /* Appelée quand la réponse est validée (Oui ou Non). Elle est définitive. */
+  var answerMarked = false;
+  function markAnswered(value) {
+    if (TEST) return;
+    try {
+      localStorage.setItem(ME_KEY, "1");
+      localStorage.setItem(ANS_KEY, value);
+    } catch (e) {}
+    if (answerMarked) return;
+    answerMarked = true;
+    try { fetch(LOCK_BASE + "/hit/" + LOCK_NS + "/" + LOCK_ROOM).catch(function () {}); } catch (e) {}
+  }
+
+  function lockOut() {
+    if (lockedOut) return;
+    lockedOut = true;
+    typingDone = true;
+    clearTimeout(typeTimer);
+    clearInterval(pollTimer);
+    disarm();
+    letter.hidden = true;
+    $("fx").hidden = true;
+    $("thanks").hidden = true;
+    $("farewell").classList.remove("on");
+    $("lock").hidden = false;
+  }
+
+  function checkLock() {
+    if (TEST || lockedOut || isMe()) return Promise.resolve();
+    return remoteAnswered().then(function (done) { if (done) lockOut(); });
+  }
+  var pollTimer = setInterval(checkLock, 8000);
+
+  function startMachine() {
+    if (lockedOut || typingDone) return;
+    if (reduce) { finishTyping(); return; }
+    letter.classList.add("machine-on");
+    $("btn-skip").hidden = false;
+    $("btn-skip").addEventListener("click", finishTyping);
+    typeTimer = setTimeout(step, 600);
+  }
+
+  /* ---------- Boutons à deux clics ---------- */
+  var armed = null;
+  var sparkTimer = null;
+  var yes = $("btn-yes"), no = $("btn-no"), hint = $("hint");
+
+  function disarm() {
+    armed = null;
+    yes.classList.remove("armed");
+    no.classList.remove("armed");
+    clearInterval(sparkTimer);
+    sparkTimer = null;
+    hint.textContent = "";
+  }
+
+  function arm(which) {
+    disarm();
+    armed = which;
+    var btn = which === "yes" ? yes : no;
+    btn.classList.add("armed");
+    hint.textContent = "Clique encore une fois pour confirmer.";
+    var colors = which === "yes" ? rainbow : warm;
+    var ticks = 0;
+    sparkTimer = setInterval(function () {
+      var r = btn.getBoundingClientRect();
+      var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      if (ticks++ % 10 === 0) ring(cx, cy, which === "yes" ? "#ffb86b" : "#f2c200", 150, 700);
+      for (var i = 0; i < 2; i++) {
+        var a = Math.random() * Math.PI * 2;
+        var px = cx + Math.cos(a) * (r.width / 2) * 1.1;
+        var py = cy + Math.sin(a) * (r.height / 2) * 1.25;
+        spark(px, py, colors[Math.floor(Math.random() * colors.length)], 38, 600);
+      }
+    }, 70);
+  }
+
+  yes.addEventListener("click", function () {
+    if (armed !== "yes") { arm("yes"); return; }
+    disarm();
+    sayYes();
+  });
+  no.addEventListener("click", function () {
+    if (armed !== "no") { arm("no"); return; }
+    disarm();
+    leavePage();
+  });
+
+  /* ---------- Chemin du "Non" : définitif ---------- */
+  function lockChoices() {
+    $("choices").style.pointerEvents = "none";
+    clearInterval(pollTimer);
+  }
+
+  function dust() {
+    if (reduce) return;
+    var n = 0;
+    var t = setInterval(function () {
+      var r = letter.getBoundingClientRect();
+      for (var i = 0; i < 3; i++) {
+        var x = Math.min(window.innerWidth - 4, Math.max(4, r.right));
+        var y = Math.min(window.innerHeight - 4, Math.max(4, r.top + Math.random() * r.height));
+        spark(x, y, i % 2 ? "#a9a39a" : "#f2c200", 36, 600);
+      }
+      if (++n > 24) clearInterval(t);
+    }, 40);
+  }
+
+  function leavePage() {
+    finalNo = true;
+    lockChoices();
+    markAnswered("no");
+    letter.classList.add("gone");
+    dust();
+    setTimeout(function () { $("farewell").classList.add("on"); }, reduce ? 0 : 900);
+  }
+
+  function finalNoInstant() {
+    finalNo = true;
+    typingDone = true;
+    clearInterval(pollTimer);
+    letter.hidden = true;
+    $("farewell").classList.add("now", "on");
+  }
+
+  /* ---------- Chemin du "Oui" : définitif ---------- */
+  var cv = $("fx");
+  var ctx = cv.getContext("2d");
+  var parts = [];
+  var raf = 0;
+  var showUntil = 0;
+  var nextBurst = 0;
+  var nextHeart = 0;
+  var fxColors = ["#ff6f8a", "#ffd166", "#7bdff2", "#b2f7ef", "#f7a8ff", "#ffffff", "#ff9f68"];
+  var heartColors = ["#ff6f8a", "#ff9fb2", "#ffd1dc", "#ef476f"];
+
+  function size() {
+    var d = window.devicePixelRatio || 1;
+    cv.width = Math.floor(window.innerWidth * d);
+    cv.height = Math.floor(window.innerHeight * d);
+    ctx.setTransform(d, 0, 0, d, 0, 0);
+  }
+  window.addEventListener("resize", size);
+  size();
+
+  function burst() {
+    var x = window.innerWidth * (0.15 + Math.random() * 0.7);
+    var y = window.innerHeight * (0.12 + Math.random() * 0.45);
+    var n = reduce ? 16 : 70;
+    var c1 = fxColors[Math.floor(Math.random() * fxColors.length)];
+    var c2 = fxColors[Math.floor(Math.random() * fxColors.length)];
+    for (var i = 0; i < n; i++) {
+      var ang = (Math.PI * 2 * i) / n + Math.random() * 0.2;
+      var sp = 1.5 + Math.random() * 4.5;
+      parts.push({ t: "dot", x: x, y: y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, life: 0, max: 60 + Math.random() * 40, c: i % 2 ? c1 : c2, r: 1.5 + Math.random() * 1.8 });
+    }
+  }
+
+  function cannons() {
+    var W = window.innerWidth, H = window.innerHeight;
+    var cols = rainbow.concat(["#ffffff", "#ff6f8a"]);
+    for (var side = 0; side < 2; side++) {
+      for (var i = 0; i < (reduce ? 20 : 70); i++) {
+        var dir = side ? -1 : 1;
+        parts.push({
+          t: "conf", x: side ? W : 0, y: H * 0.85,
+          vx: dir * (3 + Math.random() * 7), vy: -(8 + Math.random() * 9),
+          w: 6 + Math.random() * 6, h: 3 + Math.random() * 4,
+          rot: Math.random() * 6, vr: (Math.random() - 0.5) * 0.4,
+          life: 0, max: 130 + Math.random() * 60, c: cols[Math.floor(Math.random() * cols.length)]
+        });
+      }
+    }
+  }
+
+  function heartAt(x, y, s) {
+    parts.push({
+      t: "heart", x: x, y: y, s: s,
+      vx: 0, vy: -(1 + Math.random() * 1.4), ph: Math.random() * 6,
+      life: 0, max: 99999, c: heartColors[Math.floor(Math.random() * heartColors.length)]
+    });
+  }
+
+  function heartRain() {
+    var W = window.innerWidth, H = window.innerHeight;
+    for (var i = 0; i < 26; i++) heartAt(Math.random() * W, H + 10 + Math.random() * 120, 8 + Math.random() * 12);
+  }
+
+  function drawHeart(x, y, s, rot) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rot);
+    ctx.beginPath();
+    ctx.moveTo(0, s * 0.3);
+    ctx.bezierCurveTo(-s, -s * 0.4, -s * 0.5, -s, 0, -s * 0.4);
+    ctx.bezierCurveTo(s * 0.5, -s, s, -s * 0.4, 0, s * 0.3);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function frame(t) {
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    if (t < showUntil && t >= nextBurst) { burst(); nextBurst = t + 280 + Math.random() * 380; }
+    else if (finalYes && t >= showUntil && t >= nextBurst) { burst(); nextBurst = t + 2500 + Math.random() * 2000; }
+    if (finalYes && t >= nextHeart) { heartAt(Math.random() * window.innerWidth, window.innerHeight + 10, 8 + Math.random() * 12); nextHeart = t + (reduce ? 900 : 330); }
+
+    parts = parts.filter(function (p) { return p.t === "heart" ? p.y > -30 : p.life < p.max; });
+    parts.forEach(function (p) {
+      p.life++;
+      if (p.t === "heart") {
+        p.x += Math.sin(p.life / 18 + p.ph) * 0.7;
+        p.y += p.vy;
+        ctx.globalAlpha = 0.85;
+        ctx.fillStyle = p.c;
+        drawHeart(p.x, p.y, p.s, Math.sin(p.life / 25 + p.ph) * 0.3);
+      } else if (p.t === "conf") {
+        p.vy += 0.2; p.vx *= 0.985; p.vy *= 0.985;
+        p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+        ctx.globalAlpha = Math.min(1, (p.max - p.life) / 30);
+        ctx.fillStyle = p.c;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      } else {
+        p.vy += 0.06; p.vx *= 0.985; p.vy *= 0.985;
+        p.x += p.vx; p.y += p.vy;
+        ctx.globalAlpha = Math.max(0, 1 - p.life / p.max);
+        ctx.fillStyle = p.c;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+    ctx.globalAlpha = 1;
+    if (t < showUntil || parts.length || finalYes) { raf = requestAnimationFrame(frame); }
+    else { raf = 0; ctx.clearRect(0, 0, window.innerWidth, window.innerHeight); }
+  }
+
+  function celebrate(light) {
+    var now = performance.now();
+    showUntil = now + (light ? 3000 : 9000);
+    nextBurst = now;
+    nextHeart = now;
+    if (!light) { cannons(); heartRain(); }
+    if (!raf) raf = requestAnimationFrame(frame);
+  }
+
+  /* Mail "elle a dit oui" : ne marche que si la page est en ligne (pas ouverte depuis un fichier). */
+  var mailSent = false;
+  function notifyYes() {
+    if (mailSent || !NOTIFY_EMAIL || location.protocol === "file:") return;
+    mailSent = true;
+    try {
+      fetch("https://formsubmit.co/ajax/" + encodeURIComponent(NOTIFY_EMAIL), {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({ _subject: TEST ? "Test : le mail fonctionne" : "Elle a dit oui", _template: "box", message: TEST ? "Ceci est un essai." : "Lou a dit oui !" })
+      }).catch(function () {});
+    } catch (e) {}
+  }
+
+  function sayYes() {
+    finalYes = true;
+    lockChoices();
+    markAnswered("yes");
+    notifyYes();
+    var r = yes.getBoundingClientRect();
+    var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    ring(cx, cy, "#ffb86b", 280, 900);
+    setTimeout(function () { ring(cx, cy, "#6ec6ff", 420, 1000); }, 150);
+    setTimeout(function () { ring(cx, cy, "#c39bff", 560, 1100); }, 300);
+    flash();
+    letter.classList.add("fade");
+    setTimeout(function () {
+      letter.hidden = true;
+      $("thanks").hidden = false;
+      celebrate(false);
+    }, reduce ? 0 : 450);
+  }
+
+  function finalYesInstant() {
+    finalYes = true;
+    typingDone = true;
+    clearInterval(pollTimer);
+    letter.hidden = true;
+    $("thanks").hidden = false;
+    celebrate(true);
+  }
+
+  /* ---------- Démarrage ---------- */
+  if (TEST) {
+    var badge = document.createElement("div");
+    badge.className = "testbadge";
+    badge.textContent = "Mode essai : rien n'est enregistré";
+    document.body.appendChild(badge);
+  }
+  var prev = savedAnswer();
+  if (prev === "yes") {
+    finalYesInstant();
+  } else if (prev === "no") {
+    finalNoInstant();
+  } else {
+    /* On vérifie d'abord (2,5 s au maximum), puis la machine démarre. */
+    Promise.race([
+      checkLock(),
+      new Promise(function (res) { setTimeout(res, 2500); })
+    ]).then(startMachine);
+  }
+})();
+</script>
+</body>
+</html>
